@@ -21,14 +21,14 @@ type BenchResults struct {
 	Submitter  string      `json:"submitter"`
 	Repo       string      `json:"repo"`
 	Branch     string      `json:"branch"`
-	RunDate    time.Time   `json:"runDate"`
+	RunDate    int64       `json:"runDate"`
 	System     SysInfo     `json:"system"`
 	Benchmarks []Benchmark `json:"benchmarks"`
 }
 
 type CommitInfo struct {
-	Hash string    `json:"hash"`
-	Date time.Time `json:"date"`
+	Hash string `json:"hash"`
+	Date int64  `json:"date"`
 }
 
 type SysInfo struct {
@@ -44,6 +44,7 @@ type Benchmark struct {
 }
 
 type Metric struct {
+	Name   string  `json:"name"`
 	Output bool    `json:"output"`
 	Value  float64 `json:"value"`
 	Type   string  `json:"type"`
@@ -85,6 +86,8 @@ func getBasicInfo() (*BenchResults, error) {
 
 	out.Repo = filepath.Base(dir)
 
+	out.RunDate = time.Now().Unix()
+
 	return out, nil
 }
 
@@ -112,7 +115,7 @@ func getCommitInfo() (*CommitInfo, error) {
 
 	return &CommitInfo{
 		Hash: commitHash,
-		Date: t,
+		Date: t.Unix(),
 	}, nil
 }
 
@@ -215,6 +218,7 @@ func main() {
 				units := strings.Split(metricName, "/")[0]
 
 				b.Metrics = append(b.Metrics, Metric{
+					Name:   metricName,
 					Value:  val,
 					Output: true,
 					Type:   units,
